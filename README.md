@@ -1,37 +1,91 @@
-# Play_DLL
+# 🎧 Play_DLL
 
-Play_DLL is a python and vlc based music player that can stream any song directly from the web
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-GPL-green.svg)](./LICENSE)
+[![VLC](https://img.shields.io/badge/VLC-Required-orange.svg)](https://www.videolan.org/vlc/)
 
-# Functions
-- **🎵Playing song directly from song name** 
-- **▶Playing songs directly from youtube URL**
-- **📂Playing songs directly from files**
-- **⏸️Seeking, pause, resume functionality**
-- **</>No console output**
-# Usage
+**Play_DLL** is a lightweight Python library built on **VLC** that allows you to **stream and control music directly from the internet** with just a few lines of code.
+
+---
+
+## ✨ Features
+
+* 🎵 **Play songs directly from song name**
+* ▶️ **Play songs directly from YouTube URL**
+* 📂 **Play songs directly from local files**
+* ⏸️ **Pause, Resume & Seek functionality**
+* 🧼 **No console output clutter**
+
+---
+
+## 🚀 Installation
+
+```bash
+pip install python-vlc yt-dlp requests
+```
+
+(You can also clone this repo to access the full implementation.)
+
+```bash
+git clone https://github.com/yourusername/Play_DLL.git
+cd Play_DLL
+```
+
+---
+
+## 🧪 Usage Example
+
 ```python
 import Play_DLL
 
 player = Play_DLL.Play_DLL()
-player.play_by_songName("Blinding lights")
+player.play_by_songName("Blinding Lights")
 ```
 
-### Pause/Resume
-Resumes or pauses the song.
+### ⏸ Pause / Resume
+
 ```python
 player.pause_resume_song()
 ```
 
-### Seeking
+### ⏩ Seek
 
 ```python
-player.seek(12) # <-- In seconds, make sure it is less than the duration 
+player.seek(12)  # in seconds (must be less than total duration)
 ```
 
-# Inner Logic
+---
 
-- **Parsing the youtube results, after searching the song name using *requests***
+## 🧠 Inner Logic
 
-- **Using the topmost result's youtube URL, the URL of the best audio stream is derived using *yt_dlp***
+* Parses YouTube search results using **`requests`**
+* Fetches the **top audio stream URL** with **`yt_dlp`**
+* Streams the audio using **`python-vlc`**
 
-- **The URL is then streamed by python-vlc**
+---
+
+## 📂 Project Structure
+
+```
+Play_DLL/
+│── Play_DLL.py        # Main player module
+│── requirements.txt   # Dependencies
+│── README.md          # Documentation
+```
+
+---
+
+## 📝 License
+
+This project is licensed under the [GPL-3.0 License](./LICENSE).
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeatu
