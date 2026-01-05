@@ -2,9 +2,10 @@ import requests
 import os
 import ctypes
 import vlc
+import json
+import subprocess
 
 from time import sleep
-from yt_dlp import YoutubeDL
 
 
 class Play_DLL:
@@ -23,32 +24,27 @@ class Play_DLL:
         # Load the DLL manually. This was done to avoid the error Libvlc.dll not found.
         ctypes.CDLL(os.path.join(self.vlcPath, "libvlc.dll"))
 
-    def url_extracter(self, song_name: str) -> str:
-        """
-        Function to find the song url from the entered youtube URL.
-        """
 
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "quiet": True,
-            "default_search": "ytsearch",
-            "noplaylist": True,
-        }
+    def url_extracter(self, yt_url: str) -> str:
+        """Extracts the direct URLto the song to stream"""
 
-        with YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(song_name, download=False)
-            # If it's a search result, extract the first entry
-            if "entries" in info:
-                info = info["entries"][0]
+        result = subprocess.run(
+            ["yt-dlp", "--no-warning", "--get-url", yt_url],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        result = result.stdout.strip()
 
-        return info["url"]
+        return result.split("\n")[1]
+
 
     def get_yt_song_url(self, query):
         """
         Function to find YouTube video URL of the Song requested.
         """
 
-        url = "https://www.youtube.com/results?q=" + query + " song lyrics"
+        url = "https://www.youtube.com/results?q=" + query
 
         count = 0
         cont = requests.get(url)
@@ -63,7 +59,9 @@ class Play_DLL:
         if lst[count - 5] == "/results":
             raise Exception("No video found.")
 
-        return "https://www.youtube.com" + lst[count - 5]
+        yt_url = "https://www.youtube.com" + lst[count - 5]
+
+        return yt_url
 
     def play_by_song_url(self, url):
         """
@@ -77,20 +75,27 @@ class Play_DLL:
         except:
             pass
 
-        self.player = vlc.MediaPlayer(url)
+        self.player = vlc.MediaPlayer(url, ":no-video")
 
         self.player.play()  # plays the song
         sleep(1)
-        while self.player.is_playing:
-            sleep(1)
-        else:
-            self.player.stop()
+        while True:
+            state = self.player.get_state()
+
+            if state in (vlc.State.Ended, vlc.State.Stopped, vlc.State.Error):
+                break
+
+            sleep(0.5)
+
+        self.player.stop()
 
     def play_by_yt_url(self, yt_url):
         """Function to play song from youtube video URL"""
 
+        final_url = self.url_extracter(json.loads(f'"{yt_url}"'))
+        sleep(1)                  
         self.play_by_song_url(
-            self.url_extracter(yt_url)
+            final_url
         )  # extracts the song url from the youtube url and feeds to play_by_song_url function
 
     def play_by_songName(self, song_name):
@@ -123,3 +128,10 @@ class Play_DLL:
         # lIKE IF WE HAVE TO SEEK TO 20 SECONDS THEN WE HAVE TO GIVE 20 IN THE ARGUMENTS
 
         self.player.set_position(pos)
+
+
+# testing
+if __name__ == '__main__':
+
+    player = Play_DLL()
+    player.url_extracter(player.get_yt_song_url(r"blinding lights"))
